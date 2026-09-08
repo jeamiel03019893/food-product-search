@@ -1,0 +1,95 @@
+export const en = {
+  common: {
+    productImageAlt: "Product image",
+  },
+  language: {
+    ariaLabel: "Language",
+  },
+  nav: {
+    userMenu: "User menu",
+    account: "Account",
+    subscription: "Subscription",
+  },
+  app: {
+    title: "Food Product Search - Assessment",
+  },
+  search: {
+    placeholder: "Search for a product by name…",
+    ariaLabel: "Search products",
+    submit: "Search",
+  },
+  table: {
+    columnName: "Name",
+    columnBrand: "Brand",
+    view: "View",
+    fetchError: "Something went wrong fetching products.",
+    empty: "No products available",
+    pageIndicator: "Page {page} of {pageCount}",
+    previous: "Previous",
+    next: "Next",
+  },
+  product: {
+    detailsTitle: "Product details",
+    notFound: "Product not found.",
+    loadError: "Something went wrong loading this product.",
+    unknownBrand: "Unknown brand",
+    ingredients: "Ingredients",
+    nutrition: "Nutrition (per 100g)",
+    noNutrition: "No nutrition data available.",
+    subscribeGate:
+      "Subscribe to see detailed nutritional information for this product.",
+  },
+  subscription: {
+    noSubscription: "No Subscription",
+    activeLabel: "{interval} Subscription",
+    interval: {
+      day: "Daily",
+      week: "Weekly",
+      month: "Monthly",
+      year: "Yearly",
+    },
+    unit: {
+      day: "day",
+      week: "week",
+      month: "month",
+      year: "year",
+    },
+    tooltip: "Press to subscribe",
+    modalTitle: "Subscription plans",
+    modalDescriptionSubscribed:
+      "You have an active subscription. Selecting a different plan will switch you to it.",
+    modalDescriptionUnsubscribed:
+      "Subscribe to unlock detailed nutritional information.",
+    loadError: "Could not load subscription plans. Please try again.",
+    noPlans: "No subscription plans are available right now.",
+    currentPlan: "Current plan",
+    switchPlan: "Switch to this plan",
+    subscribe: "Subscribe",
+    defaultPlanName: "Subscription",
+    billedPer: "Billed per {interval}",
+    oneTime: "One-time",
+    overlayMessage: "Processing your subscription…",
+    toastRedirecting: "Redirecting to checkout…",
+    toastSwitching: "Cancelling current plan and redirecting to checkout…",
+    toastCheckoutError: "Could not start checkout",
+    toastSwitchError: "Could not switch plans",
+    confirmTitle: "Switch subscription plan?",
+    confirmDescription:
+      "This will cancel your current subscription and start a new one for the plan you selected.",
+    keepPlan: "Keep current plan",
+    confirmSwitch: "Cancel & switch",
+    switchingInProgress: "Switching…",
+    cancelSubscription: "Cancel subscription",
+    cancelConfirmTitle: "Cancel subscription?",
+    cancelConfirmDescription:
+      "This will cancel your subscription immediately — you'll lose access to detailed nutritional information right away.",
+    keepSubscription: "Keep subscription",
+    confirmCancel: "Yes, cancel",
+    cancellingInProgress: "Cancelling…",
+    toastCancelling: "Cancelling your subscription…",
+    toastCancelError: "Could not cancel subscription",
+  },
+  languageSwitch: {
+    overlayMessage: "Updating language…",
+  },
+} as const;

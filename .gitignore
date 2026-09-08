@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+
+# turbo
+.turbo/
+
+# build outputs
+.next/
+out/
+dist/
+generated/
+
+# typescript
+*.tsbuildinfo
+
+# env files
+.env
+.env.local
+.env.*.local
+
+# misc
+.DS_Store

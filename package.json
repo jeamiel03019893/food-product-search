@@ -1,0 +1,15 @@
+{
+	"name": "assessment-food-product-search",
+	"private": true,
+	"scripts": {
+		"dev": "turbo run dev",
+		"build": "turbo run build",
+		"start": "turbo run start",
+		"lint": "turbo run lint",
+		"test": "turbo run test"
+	},
+	"packageManager": "pnpm@9.12.0",
+	"devDependencies": {
+		"turbo": "^2.10.12"
+	}
+}
