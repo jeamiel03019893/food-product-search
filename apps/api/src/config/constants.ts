@@ -13,4 +13,4 @@ export const DEMO_USER_NAME = 'Demo User';
  * `SearchHistory.language`. Not Open Food Facts-specific; the
  * integration layer maps these onto OFF's own language codes.
  */
-export const SUPPORTED_LANGUAGES = ['en', 'de', 'fr'];
+export const SUPPORTED_LANGUAGES = ['en', 'nl', 'de', 'fr'];

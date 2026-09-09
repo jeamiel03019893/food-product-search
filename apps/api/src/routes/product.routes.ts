@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { param, query } from 'express-validator';
 import {
 	getProductByBarcodeHandler,
+	getRecentSearchesHandler,
 	searchProductsHandler,
 } from '../controller/product.controller.js';
 import { handleValidationErrors } from '../middleware/request-errors.middleware.js';
@@ -16,6 +17,8 @@ productRouter.get(
 	handleValidationErrors,
 	searchProductsHandler,
 );
+
+productRouter.get('/products/recent-searches', getRecentSearchesHandler);
 
 productRouter.get(
 	'/product/:barcode',

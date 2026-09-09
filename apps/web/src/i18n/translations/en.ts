@@ -17,6 +17,7 @@ export const en = {
     placeholder: "Search for a product by name…",
     ariaLabel: "Search products",
     submit: "Search",
+    recentSearchesLabel: "Recent searches",
   },
   table: {
     columnName: "Name",

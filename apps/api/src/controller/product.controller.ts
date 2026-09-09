@@ -1,7 +1,10 @@
 import { APIError, apiResponse } from '../libs/api-responses.js';
 import { DEMO_USER_ID, SUPPORTED_LANGUAGES } from '../config/constants.js';
 import { findActiveByUserId } from '../repository/subscription.repository.js';
-import { createSearchHistory } from '../repository/search-history.repository.js';
+import {
+	createSearchHistory,
+	findRecentByUserId,
+} from '../repository/search-history.repository.js';
 import {
 	getProductByBarcode,
 	searchProducts,
@@ -51,6 +54,23 @@ export const searchProductsHandler = async (
 	try {
 		const result = await searchProducts(searchStr, language, queryOptions);
 		return apiResponse(res, 200, result);
+	} catch (err) {
+		next(err);
+	}
+};
+
+export const getRecentSearchesHandler = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const recentSearches = await findRecentByUserId(DEMO_USER_ID);
+		const results = recentSearches.map((entry) => ({
+			searchTerm: entry.searchTerm,
+			searchedAt: entry.createdAt,
+		}));
+		return apiResponse(res, 200, results);
 	} catch (err) {
 		next(err);
 	}

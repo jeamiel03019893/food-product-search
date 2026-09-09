@@ -31,3 +31,10 @@ export type ProductDetailResponse = OpenFoodFactsProduct | BasicProductInfo;
 export const isFullProduct = (
   product: ProductDetailResponse,
 ): product is OpenFoodFactsProduct => "nutriments" in product;
+
+// Mirrors GET /api/products/recent-searches's response
+// (apps/api/src/controller/product.controller.ts)
+export interface RecentSearch {
+  searchTerm: string;
+  searchedAt: string;
+}

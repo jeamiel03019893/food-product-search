@@ -25,6 +25,7 @@ const USER_AGENT = 'FoodProductSearchAssessment';
  */
 const OFF_LANGUAGE_CODE: Record<SupportedLanguage, string> = {
 	en: 'en',
+	nl: 'nl',
 	de: 'de',
 	fr: 'fr',
 };

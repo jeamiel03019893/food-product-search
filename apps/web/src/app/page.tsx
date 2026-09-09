@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SubscriptionStatusButton } from "@/components/subscription/subscription-status-button";
 import { LanguageSelector } from "@/components/language-selector";
@@ -11,6 +12,7 @@ import { SubscriptionPricesModal } from "@/components/subscription/subscription-
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { useProductSearch } from "@/hooks/use-product-search";
 import { useProductDetail } from "@/hooks/use-product-detail";
+import { RECENT_SEARCHES_QUERY_KEY } from "@/hooks/use-recent-searches";
 import { useTranslation } from "@/i18n/language-provider";
 
 const PAGE_SIZE = 10;
@@ -18,6 +20,7 @@ const PAGE_SIZE = 10;
 export default function Home() {
   const { t, language, switchingLanguage, notifyLanguageApplied } =
     useTranslation();
+  const queryClient = useQueryClient();
   const [searchInput, setSearchInput] = useState("");
   const [submittedSearch, setSubmittedSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -51,6 +54,21 @@ export default function Home() {
     if (isFetching || detailFetching) return;
     notifyLanguageApplied();
   }, [switchingLanguage, isFetching, detailFetching, notifyLanguageApplied]);
+
+  // Recent searches refresh once per newly-submitted search term, right
+  // after that search's response lands — whether it returned products or
+  // not. Keyed off isFetching settling rather than data.products.length
+  // so an empty result still counts as "responded". The ref guards
+  // against re-firing on pagination, which changes `page` but not
+  // `submittedSearch`.
+  const settledSearchRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!submittedSearch) return;
+    if (isFetching) return;
+    if (settledSearchRef.current === submittedSearch) return;
+    settledSearchRef.current = submittedSearch;
+    void queryClient.invalidateQueries({ queryKey: RECENT_SEARCHES_QUERY_KEY });
+  }, [submittedSearch, isFetching, queryClient]);
 
   const handleSearch = () => {
     setSubmittedSearch(searchInput);

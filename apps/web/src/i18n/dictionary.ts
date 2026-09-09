@@ -1,4 +1,5 @@
 import { en } from './translations/en';
+import { nl } from './translations/nl';
 import { de } from './translations/de';
 import { fr } from './translations/fr';
 
@@ -44,6 +45,7 @@ export const getByPath = (dict: Dictionary, key: DictionaryKey): string => {
 
 export const dictionaries: Record<SupportedLanguage, Dictionary> = {
 	en,
+	nl,
 	de,
 	fr,
 };

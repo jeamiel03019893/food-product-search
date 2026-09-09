@@ -19,6 +19,7 @@ export const de: Dictionary = {
     placeholder: "Nach einem Produktnamen suchen…",
     ariaLabel: "Produkte suchen",
     submit: "Suchen",
+    recentSearchesLabel: "Letzte Suchanfragen",
   },
   table: {
     columnName: "Name",

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
 	getProductByBarcodeHandler,
+	getRecentSearchesHandler,
 	searchProductsHandler,
 } from '../../src/controller/product.controller.js';
 import { OpenFoodFactsError } from '../../src/integration/open-food-facts.integration.js';
@@ -21,6 +22,7 @@ vi.mock('../../src/integration/open-food-facts.integration.js', async () => {
 
 vi.mock('../../src/repository/search-history.repository.js', () => ({
 	createSearchHistory: vi.fn(),
+	findRecentByUserId: vi.fn(),
 }));
 
 // Not under test here (getProductByBarcodeHandler's subscription check
@@ -35,12 +37,13 @@ vi.mock('../../src/repository/subscription.repository.js', () => ({
 const { searchProducts, getProductByBarcode } = await import(
 	'../../src/integration/open-food-facts.integration.js'
 );
-const { createSearchHistory } = await import(
+const { createSearchHistory, findRecentByUserId } = await import(
 	'../../src/repository/search-history.repository.js'
 );
 const mockSearchProducts = vi.mocked(searchProducts);
 const mockGetProductByBarcode = vi.mocked(getProductByBarcode);
 const mockCreateSearchHistory = vi.mocked(createSearchHistory);
+const mockFindRecentByUserId = vi.mocked(findRecentByUserId);
 
 const mockResponse = () => {
 	const status = vi.fn();
@@ -55,6 +58,7 @@ beforeEach(() => {
 	mockSearchProducts.mockReset();
 	mockGetProductByBarcode.mockReset();
 	mockCreateSearchHistory.mockReset();
+	mockFindRecentByUserId.mockReset();
 	mockCreateSearchHistory.mockResolvedValue({
 		id: 'sh_1',
 		userId: DEMO_USER_ID,
@@ -206,6 +210,72 @@ describe('getProductByBarcodeHandler', () => {
 		const next = vi.fn();
 
 		await getProductByBarcodeHandler(req, mockResponse().res, next);
+
+		expect(next).toHaveBeenCalledWith(err);
+	});
+});
+
+describe('getRecentSearchesHandler', () => {
+	it('responds with the deduplicated recent searches mapped to searchTerm/searchedAt', async () => {
+		const createdAt1 = new Date('2026-09-01T00:00:00.000Z');
+		const createdAt2 = new Date('2026-09-02T00:00:00.000Z');
+		mockFindRecentByUserId.mockResolvedValue([
+			{
+				id: 'sh_2',
+				userId: DEMO_USER_ID,
+				searchTerm: 'cookies',
+				language: 'en',
+				createdAt: createdAt2,
+			},
+			{
+				id: 'sh_1',
+				userId: DEMO_USER_ID,
+				searchTerm: 'chips',
+				language: 'en',
+				createdAt: createdAt1,
+			},
+		]);
+		const req = {} as unknown as Request;
+		const { res, status, json } = mockResponse();
+		const next = vi.fn();
+
+		await getRecentSearchesHandler(req, res, next);
+
+		expect(mockFindRecentByUserId).toHaveBeenCalledWith(DEMO_USER_ID);
+		expect(status).toHaveBeenCalledWith(200);
+		expect(json).toHaveBeenCalledWith(
+			expect.objectContaining({
+				results: [
+					{ searchTerm: 'cookies', searchedAt: createdAt2 },
+					{ searchTerm: 'chips', searchedAt: createdAt1 },
+				],
+			}),
+		);
+		expect(next).not.toHaveBeenCalled();
+	});
+
+	it('responds with an empty list when the user has no search history', async () => {
+		mockFindRecentByUserId.mockResolvedValue([]);
+		const req = {} as unknown as Request;
+		const { res, status, json } = mockResponse();
+		const next = vi.fn();
+
+		await getRecentSearchesHandler(req, res, next);
+
+		expect(status).toHaveBeenCalledWith(200);
+		expect(json).toHaveBeenCalledWith(
+			expect.objectContaining({ results: [] }),
+		);
+		expect(next).not.toHaveBeenCalled();
+	});
+
+	it('calls next() with the error when the repository call rejects', async () => {
+		const err = new Error('db unavailable');
+		mockFindRecentByUserId.mockRejectedValue(err);
+		const req = {} as unknown as Request;
+		const next = vi.fn();
+
+		await getRecentSearchesHandler(req, mockResponse().res, next);
 
 		expect(next).toHaveBeenCalledWith(err);
 	});

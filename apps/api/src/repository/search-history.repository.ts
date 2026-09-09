@@ -17,6 +17,12 @@ export const createSearchHistory = async (
 	});
 };
 
+/**
+ * Returns up to `limit` of a user's most recent searches, deduplicated
+ * by searchTerm — i.e. at most one row per unique searchTerm, keeping
+ * only the most recent occurrence of that term (by createdAt) when the
+ * same term was searched more than once. Ordered most-recent-first.
+ */
 export const findRecentByUserId = async (
 	userId: string,
 	limit = 10,
@@ -24,6 +30,7 @@ export const findRecentByUserId = async (
 	return prisma.searchHistory.findMany({
 		where: { userId },
 		orderBy: { createdAt: 'desc' },
+		distinct: ['searchTerm'],
 		take: limit,
 	});
 };
