@@ -1,6 +1,6 @@
 # Food Product Search
 
-A full-stack app for searching [Open Food Facts](https://world.openfoodfacts.org/) products by name. Everyone can see a product's name, brand, and image; detailed nutritional values are gated behind an active Stripe subscription for a single demo user. The UI and product data are available in English, Dutch, German, and French via a manual language selector.
+A full-stack app for searching [Open Food Facts](https://world.openfoodfacts.org/) products by name. Everyone can see a product's name, brand, and image; detailed nutritional values are gated behind an active Stripe subscription for a single demo user. The UI and product data are available in English, Dutch, German, and French via a manual language selector. The search field also shows a filtered autocomplete dropdown of the demo user's recent searches as they type.
 
 ## Stack
 
@@ -74,6 +74,8 @@ pnpm --filter @afps/api test
 - **Subscription cancellation syncs to MySQL directly from Stripe's API response, not solely via webhook.** The Stripe webhook (`customer.subscription.*`, `invoice.payment_*`) is still the source of truth for events the server didn't itself trigger (a renewal, a payment failure, a cancellation from Stripe's own customer portal). But for the one action our own backend initiates and gets a synchronous, authoritative result back for — cancelling a subscription — waiting on an async webhook round-trip to persist that result is unnecessary and fragile (a webhook delivery can fail transiently, e.g. if the local server happens to be down at that moment, silently leaving the database out of sync). The cancel endpoint writes the result immediately from Stripe's response; the webhook still processes the same event afterward as a harmless, idempotent no-op.
 - **No product-data caching.** Every search hits Open Food Facts live; there's no local cache layer for product results. Simpler, and avoids serving stale nutrition data, at the cost of one external round-trip per search.
 - **Access control is a single server-side check.** `Subscription.status === 'ACTIVE'` for the one demo user gates the detailed nutrition fields in the product-detail response; there's no session/auth token system since there's only ever one user.
+- **Recent searches are deduplicated at the query level, not in application code.** `GET /products/recent-searches` uses Prisma's `distinct: ['searchTerm']` combined with `orderBy: { createdAt: 'desc' }` — Prisma keeps the first row per distinct group according to that ordering, so this returns up to 10 most-recent, unique search terms in one query, without a manual filter-and-slice step.
+- **The recent-searches list refreshes once per submitted search, not on every keystroke or page change.** The frontend's autocomplete dropdown filters an already-fetched list client-side as the user types; that list itself is invalidated exactly once a *newly submitted* search's response has landed (whether it returned products or not), using the same settle-tracking effect pattern as the language-switch loading overlay — not react-query's `onSuccess` (removed from `useQuery` in TanStack Query v5).
 
 ## Internationalization approach
 
